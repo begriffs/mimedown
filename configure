@@ -1,0 +1,11 @@
+#!/bin/sh -eu
+
+rm -f config.mk
+
+pkg-config --print-errors 'libcmark >= 0.20'
+
+cat >> config.mk <<-EOF
+	CFLAGS += $(pkg-config --cflags libcmark)
+	LDFLAGS += $(pkg-config --libs-only-L libcmark)
+	LDLIBS += $(pkg-config --libs-only-l libcmark)
+EOF
