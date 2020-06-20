@@ -7,7 +7,7 @@ CFLAGS = -std=c99 -g -pedantic -Wall -Wextra -Wshadow -Wno-missing-braces -D_POS
 
 include config.mk
 
-mimebox : mimebox.c
+md2mime : md2mime.c
 
 clean :
-	rm -f mimebox *.o
+	rm -f md2mime *.o
