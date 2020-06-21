@@ -33,7 +33,7 @@ int main(void)
 	} section, prev_section = SEC_NONE;
 
 	puts("MIME-Version: 1.0\n"
-	     "Content-Type: multipart/mixed; boundary=boundary42");
+	     "Content-Type: multipart/related; boundary=boundary42");
 
 	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
 	{
@@ -52,7 +52,7 @@ int main(void)
 				if (section == SEC_CODE)
 				{
 					puts("Content-Type: text/x-c");
-					printf("Content-Disposition: inline; filename=%d.c;\n\n",
+					printf("Content-Disposition: inline; filename=%d.c\n\n",
 					       nth_code_block++);
 				}
 				else
