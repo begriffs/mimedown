@@ -5,6 +5,16 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static void _wordlist_invariant(const struct wordlist *ws)
+{
+	assert(ws);
+#ifndef NDEBUG
+	struct wordlist_entry *w;
+	TAILQ_FOREACH(w, ws, entries)
+		assert(w->len >= 0);
+#endif
+}
+
 /* TODO: do unicode word break detection with ICU */
 struct wordlist *build_wordlist(const char *text)
 {
@@ -23,13 +33,14 @@ struct wordlist *build_wordlist(const char *text)
 			text++;
 		TAILQ_INSERT_TAIL(ws, w, entries);
 	}
+	_wordlist_invariant(ws);
 	return ws;
 }
 
 /* note: underlying string must be freed by caller */
 void free_wordlist(struct wordlist *ws)
 {
-	assert(ws);
+	_wordlist_invariant(ws);
 	while (!TAILQ_EMPTY(ws))
 	{
 		struct wordlist_entry *w = TAILQ_FIRST(ws);
@@ -44,8 +55,9 @@ void print_wrapped(const struct wordlist *ws, const int width)
 {
 	int total = 0;
 	struct wordlist_entry *scout, *safe;
-	safe = scout = TAILQ_FIRST(ws);
+	_wordlist_invariant(ws);
 
+	safe = scout = TAILQ_FIRST(ws);
 	while (scout != NULL)
 	{
 		for (total = 0, scout = safe;
