@@ -1,8 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "wrap.h"
+
 /* libcmark */
 #include <cmark.h>
+
+#define TEXTWIDTH 72
 
 int main(void)
 {
@@ -59,10 +63,15 @@ int main(void)
 			}
 			const char *content = cmark_node_get_literal(cur);
 			if (content)
-				fputs(content, stdout);
+			{
+				struct wordlist *ws = build_wordlist(content);
+				print_wrapped(ws, TEXTWIDTH);
+				free_wordlist(ws);
+			}
 		}
 	}
 	cmark_iter_free(iter);
+	cmark_node_free(doc);
 
 	return EXIT_SUCCESS;
 }
