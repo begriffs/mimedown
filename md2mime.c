@@ -33,7 +33,9 @@ int main(void)
 	} section, prev_section = SEC_NONE;
 
 	puts("MIME-Version: 1.0\n"
-	     "Content-Type: multipart/related; boundary=boundary42");
+	     "Content-Type: multipart/alternative; boundary=boundary41\n\n"
+		 "--boundary41\n"
+	     "Content-Type: multipart/mixed; boundary=boundary42");
 
 	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
 	{
@@ -70,6 +72,21 @@ int main(void)
 			}
 		}
 	}
+	puts("\n--boundary42--\n");
+	puts("--boundary41");
+	puts("Content-Type: text/html");
+	puts("Content-Disposition: inline\n");
+
+	puts("<!DOCTYPE HTML PUBLIC \"ISO/IEC 15445:2000//DTD HTML//EN\">");
+	puts("<html><head><title>Foo</title></head>");
+	puts("<body>");
+
+	char *html = cmark_render_html(doc, CMARK_OPT_DEFAULT);
+	fputs(html, stdout);
+	free(html);
+	
+	puts("</body></html>\n");
+	puts("--boundary41--");
 	cmark_iter_free(iter);
 	cmark_node_free(doc);
 
