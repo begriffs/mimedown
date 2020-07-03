@@ -15,12 +15,18 @@ static void _wordlist_invariant(const struct wordlist *ws)
 #endif
 }
 
-/* TODO: do unicode word break detection with ICU */
-struct wordlist *build_wordlist(const char *text)
+struct wordlist *wordlist_create(void)
 {
 	struct wordlist *ws = malloc(sizeof *ws);
-	const char *start;
 	TAILQ_INIT(ws);
+	_wordlist_invariant(ws);
+	return ws;
+}
+
+/* TODO: do unicode word break detection with ICU */
+struct wordlist *wordlist_append(struct wordlist *ws, const char *text)
+{
+	const char *start;
 
 	while (start = text, *text)
 	{
@@ -38,7 +44,7 @@ struct wordlist *build_wordlist(const char *text)
 }
 
 /* note: underlying string must be freed by caller */
-void free_wordlist(struct wordlist *ws)
+void wordlist_free(struct wordlist *ws)
 {
 	_wordlist_invariant(ws);
 	while (!TAILQ_EMPTY(ws))

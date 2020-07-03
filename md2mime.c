@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -7,6 +8,33 @@
 #include <cmark.h>
 
 #define TEXTWIDTH 72
+
+void render_paragraph(cmark_iter *iter, char *prefix, char *overhang)
+{
+	cmark_event_type ev_type;
+	cmark_node *cur = cmark_iter_get_node(iter);
+	struct wordlist *ws = wordlist_create();
+
+	assert(cmark_node_get_type(cur) == CMARK_NODE_PARAGRAPH);
+
+	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
+	{
+		cur = cmark_iter_get_node(iter);
+		cmark_node_type type = cmark_node_get_type(cur);
+
+		if (ev_type == CMARK_EVENT_EXIT && type == CMARK_NODE_PARAGRAPH)
+			break;
+		if (ev_type == CMARK_EVENT_ENTER)
+		{
+			const char *content = cmark_node_get_literal(cur);
+			if (content)
+				wordlist_append(ws, content);
+		}
+	}
+
+	print_wrapped(ws, TEXTWIDTH);
+	wordlist_free(ws);
+}
 
 int main(void)
 {
@@ -64,13 +92,8 @@ int main(void)
 					puts("Content-Disposition: inline\n");
 				}
 			}
-			const char *content = cmark_node_get_literal(cur);
-			if (content)
-			{
-				struct wordlist *ws = build_wordlist(content);
-				print_wrapped(ws, TEXTWIDTH);
-				free_wordlist(ws);
-			}
+			if (cmark_node_get_type(cur) == CMARK_NODE_PARAGRAPH)
+				render_paragraph(iter, "", "");
 		}
 	}
 	puts("\n--boundary42--\n");

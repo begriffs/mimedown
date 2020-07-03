@@ -13,8 +13,9 @@ struct wordlist_entry
 };
 TAILQ_HEAD(wordlist, wordlist_entry);
 
-struct wordlist *build_wordlist(const char *text);
-void free_wordlist(struct wordlist *ws);
-void print_wrapped(const struct wordlist *ws, const int width);
+struct wordlist *wordlist_create(void);
+struct wordlist *wordlist_append(struct wordlist *ws, const char *text);
+void wordlist_free(struct wordlist *ws);
+void print_wrapped(const struct wordlist *ws, int width);
 
 #endif
