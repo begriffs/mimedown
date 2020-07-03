@@ -53,13 +53,14 @@ int main(void)
 				puts("\n--boundary42");
 				if (section == SEC_CODE)
 				{
-					puts("Content-Type: text/x-c");
+					puts("Content-Type: text/x-c; charset=\"utf-8\"");
 					printf("Content-Disposition: inline; filename=%d.c\n\n",
 					       nth_code_block++);
 				}
 				else
 				{
-					puts("Content-Type: text/plain");
+					puts("Content-Type: text/plain; charset=\"utf-8\"; "
+					     "format=\"flowed\"");
 					puts("Content-Disposition: inline\n");
 				}
 			}
@@ -74,7 +75,7 @@ int main(void)
 	}
 	puts("\n--boundary42--\n");
 	puts("--boundary41");
-	puts("Content-Type: text/html");
+	puts("Content-Type: text/html; charset=\"utf-8\"");
 	puts("Content-Disposition: inline\n");
 
 	puts("<!DOCTYPE HTML PUBLIC \"ISO/IEC 15445:2000//DTD HTML//EN\">");
