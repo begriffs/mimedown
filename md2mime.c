@@ -32,7 +32,8 @@ void render_paragraph(cmark_iter *iter, char *prefix, char *overhang)
 		}
 	}
 
-	print_wrapped(ws, TEXTWIDTH);
+	printf("%s", prefix);
+	print_wrapped(ws, overhang, TEXTWIDTH);
 	wordlist_free(ws);
 }
 

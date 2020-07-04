@@ -4,6 +4,7 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void _wordlist_invariant(const struct wordlist *ws)
 {
@@ -57,22 +58,31 @@ void wordlist_free(struct wordlist *ws)
 }
 
 /* TODO: it's greedy, use a better algo */
-void print_wrapped(const struct wordlist *ws, const int width)
+void print_wrapped(const struct wordlist *ws, const char *overhang, int width)
 {
-	int total = 0;
-	struct wordlist_entry *scout, *safe;
+	int total;
+	struct wordlist_entry *w;
 	_wordlist_invariant(ws);
 
-	safe = scout = TAILQ_FIRST(ws);
-	while (scout != NULL)
+	width -= strlen(overhang);
+
+	w = TAILQ_FIRST(ws);
+	while (w)
 	{
-		for (total = 0, scout = safe;
-			scout && total + scout->len < width;
-			total += scout->len, scout = TAILQ_NEXT(scout, entries))
+		for (total = 0;
+			w && total + w->len + 1 < width;
+			total += w->len + 1, w = TAILQ_NEXT(w, entries))
 		{
-			printf("%.*s ", (int)scout->len, scout->start);
-			safe = scout;
+			if (total > 0)
+				putchar(' ');
+			printf("%.*s", (int)w->len, w->start);
 		}
-		printf("\n");
+		if (w)
+		{
+			/* extra space is for format=flowed */
+			printf(" \n%s", overhang);
+		}
+		else
+			printf("\n");
 	}
 }
