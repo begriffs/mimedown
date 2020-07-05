@@ -37,6 +37,33 @@ void render_paragraph(cmark_iter *iter, char *prefix, char *overhang)
 	wordlist_free(ws);
 }
 
+void render_list(cmark_iter *iter)
+{
+	cmark_event_type ev_type;
+	cmark_node *cur = cmark_iter_get_node(iter);
+	cmark_list_type t = cmark_node_get_list_type(cur);
+	char *pad = ((t == CMARK_ORDERED_LIST) ? "   " : "  "),
+		 marker[10] = "* ";
+	int i = 1;
+
+	assert(cmark_node_get_type(cur) == CMARK_NODE_LIST);
+
+	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
+	{
+		cur = cmark_iter_get_node(iter);
+		cmark_node_type type = cmark_node_get_type(cur);
+
+		if (ev_type == CMARK_EVENT_EXIT && type == CMARK_NODE_LIST)
+			break;
+		if (ev_type == CMARK_EVENT_ENTER && type == CMARK_NODE_PARAGRAPH)
+		{
+			if (t == CMARK_ORDERED_LIST)
+				sprintf(marker, "%d. ", i++);
+			render_paragraph(iter, marker, pad);
+		}
+	}
+}
+
 int main(void)
 {
 	char buf[BUFSIZ];
@@ -93,8 +120,23 @@ int main(void)
 					puts("Content-Disposition: inline\n");
 				}
 			}
-			if (cmark_node_get_type(cur) == CMARK_NODE_PARAGRAPH)
-				render_paragraph(iter, "", "");
+			switch (cmark_node_get_type(cur))
+			{
+				case CMARK_NODE_LIST:
+					render_list(iter);
+					break;
+				case CMARK_NODE_HEADING:
+					// render_heading(iter);
+					break;
+				case CMARK_NODE_BLOCK_QUOTE:
+					render_paragraph(iter, "> ", "> ");
+					break;
+				case CMARK_NODE_PARAGRAPH:
+					render_paragraph(iter, "", "");
+					break;
+				default:
+					break;
+			}
 		}
 	}
 	puts("\n--boundary42--\n");
