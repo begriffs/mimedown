@@ -6,6 +6,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define MAX(x,y) ((x<y) ? (y) : (x))
+
 static void _wordlist_invariant(const struct wordlist *ws)
 {
 	assert(ws);
@@ -58,11 +60,11 @@ void wordlist_free(struct wordlist *ws)
 }
 
 /* TODO: it's greedy, use a better algo */
-void print_wrapped(const struct wordlist *ws, const char *overhang, int width)
+size_t print_wrapped(const struct wordlist *ws, const char *overhang, size_t width)
 {
-	int total;
 	struct wordlist_entry *w;
 	_wordlist_invariant(ws);
+	size_t total, longest_line = 0;
 
 	width -= strlen(overhang);
 
@@ -75,6 +77,7 @@ void print_wrapped(const struct wordlist *ws, const char *overhang, int width)
 		{
 			if (total > 0)
 				putchar(' ');
+			longest_line = MAX(total + w->len, longest_line);
 			printf("%.*s", (int)w->len, w->start);
 		}
 		if (w)
@@ -85,4 +88,5 @@ void print_wrapped(const struct wordlist *ws, const char *overhang, int width)
 		else
 			printf("\n");
 	}
+	return longest_line;
 }

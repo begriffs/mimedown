@@ -16,6 +16,6 @@ TAILQ_HEAD(wordlist, wordlist_entry);
 struct wordlist *wordlist_create(void);
 struct wordlist *wordlist_append(struct wordlist *ws, const char *text);
 void wordlist_free(struct wordlist *ws);
-void print_wrapped(const struct wordlist *ws, const char *overhang, int width);
+size_t print_wrapped(const struct wordlist *ws, const char *overhang, size_t width);
 
 #endif
