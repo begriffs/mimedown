@@ -58,7 +58,7 @@ void render_list(cmark_iter *iter)
 		if (ev_type == CMARK_EVENT_ENTER && type == CMARK_NODE_PARAGRAPH)
 		{
 			if (t == CMARK_ORDERED_LIST)
-				sprintf(marker, "%d. ", i++);
+				snprintf(marker, sizeof marker, "%d. ", i++);
 			render_paragraph(iter, marker, pad);
 		}
 	}
