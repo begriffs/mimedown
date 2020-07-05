@@ -116,6 +116,7 @@ int main(void)
 	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
 	{
 		int nth_code_block = 0;
+		const char *code;
 		cmark_node *cur = cmark_iter_get_node(iter);
 		cmark_node_type type = cmark_node_get_type(cur);
 		if (ev_type == CMARK_EVENT_ENTER)
@@ -150,6 +151,11 @@ int main(void)
 					break;
 				case CMARK_NODE_BLOCK_QUOTE:
 					render_inner_text(iter, "> ", "> ");
+					break;
+				case CMARK_NODE_CODE_BLOCK:
+					code = cmark_node_get_literal(cur);
+					if (code)
+						fputs(code, stdout);
 					break;
 				case CMARK_NODE_PARAGRAPH:
 					render_inner_text(iter, "", "");
