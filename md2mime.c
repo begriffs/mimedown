@@ -3,11 +3,19 @@
 #include <stdlib.h>
 
 #include "wrap.h"
+#include "vendor/uthash.h"
 
 /* libcmark */
 #include <cmark.h>
 
 #define TEXTWIDTH 72
+
+struct doc_link
+{
+	size_t id;
+	const char *url;
+	UT_hash_handle hh;
+} *g_links = NULL;
 
 size_t render_inner_text(cmark_iter *iter, char *prefix, char *overhang)
 {
@@ -26,9 +34,24 @@ size_t render_inner_text(cmark_iter *iter, char *prefix, char *overhang)
 			break;
 		if (ev_type == CMARK_EVENT_ENTER)
 		{
-			const char *content = cmark_node_get_literal(cur);
-			if (content)
-				wordlist_append(ws, content);
+			if (type == CMARK_NODE_LINK)
+			{
+				struct doc_link *link;
+				HASH_FIND_STR(g_links, cmark_node_get_url(cur), link);
+				if (!link)
+				{
+					link = malloc(sizeof *link);
+					link->id = HASH_COUNT(g_links);
+					link->url = cmark_node_get_url(cur);
+				}
+				wordlist_append(ws, FOO);
+			}
+			else
+			{
+				const char *content = cmark_node_get_literal(cur);
+				if (content)
+					wordlist_append(ws, content);
+			}
 		}
 	}
 
