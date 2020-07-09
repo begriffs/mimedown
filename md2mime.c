@@ -13,9 +13,47 @@
 struct doc_link
 {
 	size_t id;
+	char pretty_id[10];
+	const char *title;
 	const char *url;
 	UT_hash_handle hh;
 } *g_links = NULL;
+
+struct doc_link *parse_link(cmark_iter *iter)
+{
+	cmark_event_type ev_type;
+	cmark_node *cur = cmark_iter_get_node(iter);
+
+	struct doc_link *link = NULL;
+	const char *url;
+
+	assert(cmark_node_get_type(cur) == CMARK_NODE_LINK);
+
+	url = cmark_node_get_url(cur);
+	HASH_FIND_STR(g_links, url, link);
+
+	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
+	{
+		cur = cmark_iter_get_node(iter);
+		cmark_node_type type = cmark_node_get_type(cur);
+
+		if (ev_type == CMARK_EVENT_EXIT && type == CMARK_NODE_LINK)
+			break;
+		if (ev_type == CMARK_EVENT_ENTER && type == CMARK_NODE_TEXT)
+			if (!link)
+			{
+				link = malloc(sizeof *link);
+				link->id = HASH_COUNT(g_links);
+				snprintf(link->pretty_id, sizeof link->pretty_id,
+						"[%zu]", link->id);
+				link->url = url;
+				link->title = cmark_node_get_literal(cur);
+				HASH_ADD_KEYPTR(hh, g_links, link->url,
+						strlen(link->url), link);
+			}
+	}
+	return link;
+}
 
 size_t render_inner_text(cmark_iter *iter, char *prefix, char *overhang)
 {
@@ -36,15 +74,14 @@ size_t render_inner_text(cmark_iter *iter, char *prefix, char *overhang)
 		{
 			if (type == CMARK_NODE_LINK)
 			{
-				struct doc_link *link;
-				HASH_FIND_STR(g_links, cmark_node_get_url(cur), link);
-				if (!link)
+				struct doc_link *link = parse_link(iter);
+				if (link)
 				{
-					link = malloc(sizeof *link);
-					link->id = HASH_COUNT(g_links);
-					link->url = cmark_node_get_url(cur);
+					wordlist_append(ws, link->title);
+					wordlist_append(ws, link->pretty_id);
 				}
-				wordlist_append(ws, FOO);
+				else
+					wordlist_append(ws, "[could not parse link]");
 			}
 			else
 			{
@@ -182,12 +219,28 @@ int main(void)
 					break;
 				case CMARK_NODE_PARAGRAPH:
 					render_inner_text(iter, "", "");
+					puts("");
 					break;
 				default:
 					break;
 			}
 		}
 	}
+
+	if (HASH_COUNT(g_links))
+	{
+		struct doc_link *x;
+
+		puts("\n--boundary42");
+		puts("Content-Type: text/plain; charset=\"utf-8\"");
+		puts("Content-Disposition: inline\n");
+
+		/* that the ids are printed in sorted order relies on the fact
+		 * that items are visited in insertion order */
+		for (x = g_links; x; x = x->hh.next)
+			printf("%zu: %s\n", x->id, x->url);
+	}
+
 	puts("\n--boundary42--\n");
 	puts("--boundary41");
 	puts("Content-Type: text/html; charset=\"utf-8\"");
