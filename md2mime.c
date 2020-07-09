@@ -123,6 +123,7 @@ void render_list(cmark_iter *iter)
 			render_inner_text(iter, marker, pad);
 		}
 	}
+	puts("");
 }
 
 void render_heading(cmark_iter *iter)
