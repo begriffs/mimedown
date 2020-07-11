@@ -242,13 +242,13 @@ int main(void)
 		struct doc_link *x;
 
 		puts("\n--boundary42");
-		puts("Content-Type: text/plain; charset=\"utf-8\"");
-		puts("Content-Disposition: inline\n");
+		puts("Content-Type: text/uri-list; charset=\"utf-8\"");
+		puts("Content-Disposition: inline; filename=references.uri\n");
 
 		/* that the ids are printed in sorted order relies on the fact
 		 * that items are visited in insertion order */
 		for (x = g_links; x; x = x->hh.next)
-			printf("%zu: %s\n", x->id, x->url);
+			printf("# %zu: %s\n%s\n", x->id, x->title, x->url);
 	}
 
 	puts("\n--boundary42--\n");
