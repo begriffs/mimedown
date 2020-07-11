@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "filetype.h"
 #include "wrap.h"
 #include "vendor/uthash.h"
 
@@ -191,9 +192,17 @@ int main(void)
 				puts("\n--boundary42");
 				if (section == SEC_CODE)
 				{
-					puts("Content-Type: text/x-c; charset=\"utf-8\"");
-					printf("Content-Disposition: inline; filename=%d.c\n\n",
-					       nth_code_block++);
+					const char *filename = cmark_node_get_fence_info(cur);
+					printf("Content-Type: %s; charset=\"utf-8\"\n",
+						filename_mime(filename));
+					if (*filename == '\0')
+						printf(
+							"Content-Disposition: inline; filename=code-%d.txt\n\n",
+							nth_code_block++);
+					else
+						printf(
+							"Content-Disposition: inline; filename=%s\n\n",
+							filename);
 				}
 				else
 				{
