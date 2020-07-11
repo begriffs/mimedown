@@ -1,5 +1,7 @@
 .POSIX:
 
+OBJS = filetype.o wrap.o
+
 CFLAGS = -std=c99 -g -pedantic -Wall -Wextra -Wshadow
 
 .SUFFIXES :
@@ -7,7 +9,8 @@ CFLAGS = -std=c99 -g -pedantic -Wall -Wextra -Wshadow
 
 include config.mk
 
-md2mime : md2mime.c wrap.o filetype.o
+md2mime : md2mime.c $(OBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ md2mime.c $(OBJS) $(LDLIBS)
 
 wrap.o : wrap.c wrap.h vendor/queue.h
 
