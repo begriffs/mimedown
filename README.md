@@ -1,4 +1,4 @@
-### Markdown to multipart MIME (in beta)
+## Markdown to multipart MIME
 
 Answering the age-old debate: HTML or plaintext emails? Both!
 
@@ -19,3 +19,28 @@ graphical and console mail clients.
 * URLs are listed at the bottom of the text message in a special
   `text/uri-list` inline attachment, and referred to with short codes like
   `[0]`, `[1]` ... in the message text.
+
+### Installation
+
+Written in portable C99. The only requirement is the
+[cmark](https://github.com/commonmark/cmark) library to parse markdown.
+
+```sh
+# detect cmark and set up build flags
+./configure
+# then build md2mime
+make
+```
+
+### Usage
+
+```sh
+./md2mime < message.md > message.email
+```
+
+Then edit message.email to add headers like Subject, etc. Send the message
+using a program like [msmtp](https://marlam.de/msmtp/):
+
+```sh
+msmtp recipient@example.com < message.email
+```
