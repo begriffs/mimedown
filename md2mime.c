@@ -221,6 +221,7 @@ int main(void)
 					break;
 				case CMARK_NODE_BLOCK_QUOTE:
 					render_inner_text(iter, "> ", "> ");
+					puts("");
 					break;
 				case CMARK_NODE_CODE_BLOCK:
 					code = cmark_node_get_literal(cur);
