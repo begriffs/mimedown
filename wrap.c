@@ -34,8 +34,10 @@ struct wordlist *wordlist_append(struct wordlist *ws, const char *text)
 	while (start = text, *text)
 	{
 		struct wordlist_entry *w = malloc(sizeof *w);
+		while (isspace(*text))
+			text++;
 		w->start = text;
-		while (!isspace(*text) && *text)
+		while (*text && !isspace(*text))
 			text++;
 		w->len = text - start;
 		while (isspace(*text))
