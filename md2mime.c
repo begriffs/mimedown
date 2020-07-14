@@ -172,8 +172,16 @@ int main(void)
 	} section, prev_section = SEC_NONE;
 
 	puts("MIME-Version: 1.0\n"
-	     "Content-Type: multipart/alternative; boundary=boundary41\n\n"
-		 "--boundary41\n"
+	     "Content-Type: multipart/alternative; boundary=boundary41\n");
+
+	puts("--boundary41");
+	puts("Content-Type: text/markdown; charset=\"utf-8\"");
+	puts("Content-Disposition: inline\n");
+	char *md = cmark_render_commonmark(doc, CMARK_OPT_DEFAULT, TEXTWIDTH);
+	fputs(md, stdout);
+	free(md);
+
+	puts("\n--boundary41\n"
 	     "Content-Type: multipart/mixed; boundary=boundary42");
 
 	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
@@ -254,6 +262,7 @@ int main(void)
 	}
 
 	puts("\n--boundary42--\n");
+
 	puts("--boundary41");
 	puts("Content-Type: text/html; charset=\"utf-8\"");
 	puts("Content-Disposition: inline\n");
