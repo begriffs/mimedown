@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -56,7 +57,7 @@ struct doc_link *parse_link(cmark_iter *iter)
 	return link;
 }
 
-size_t render_inner_text(cmark_iter *iter, char *prefix, char *overhang)
+size_t render_inner_text(cmark_iter *iter, char *prefix, char *overhang, bool flow)
 {
 	cmark_event_type ev_type;
 	cmark_node *cur = cmark_iter_get_node(iter);
@@ -94,7 +95,7 @@ size_t render_inner_text(cmark_iter *iter, char *prefix, char *overhang)
 	}
 
 	printf("%s", prefix);
-	ret = print_wrapped(ws, overhang, TEXTWIDTH);
+	ret = print_wrapped(ws, overhang, TEXTWIDTH, flow);
 	wordlist_free(ws);
 	return ret;
 }
@@ -121,7 +122,7 @@ void render_list(cmark_iter *iter)
 		{
 			if (t == CMARK_ORDERED_LIST)
 				snprintf(marker, sizeof marker, "%d. ", i++);
-			render_inner_text(iter, marker, pad);
+			render_inner_text(iter, marker, pad, false);
 		}
 	}
 	puts("");
@@ -140,7 +141,7 @@ void render_heading(cmark_iter *iter)
 	b = (level > sizeof(borders)-1)
 		? borders[sizeof(borders)-1]
 		: borders[level];
-	width = render_inner_text(iter, "", "");
+	width = render_inner_text(iter, "", "", true);
 	while (width-- > 0)
 		putchar(b);
 	puts("\n");
@@ -220,7 +221,7 @@ int main(void)
 					render_heading(iter);
 					break;
 				case CMARK_NODE_BLOCK_QUOTE:
-					render_inner_text(iter, "> ", "> ");
+					render_inner_text(iter, "> ", "> ", true);
 					puts("");
 					break;
 				case CMARK_NODE_CODE_BLOCK:
@@ -229,7 +230,7 @@ int main(void)
 						fputs(code, stdout);
 					break;
 				case CMARK_NODE_PARAGRAPH:
-					render_inner_text(iter, "", "");
+					render_inner_text(iter, "", "", true);
 					puts("");
 					break;
 				default:

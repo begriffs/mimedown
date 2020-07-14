@@ -60,7 +60,9 @@ void wordlist_free(struct wordlist *ws)
 }
 
 /* TODO: it's greedy, use a better algo */
-size_t print_wrapped(const struct wordlist *ws, const char *overhang, size_t width)
+size_t print_wrapped(
+		const struct wordlist *ws, const char *overhang,
+		size_t width, bool flowed)
 {
 	struct wordlist_entry *w;
 	_wordlist_invariant(ws);
@@ -83,7 +85,7 @@ size_t print_wrapped(const struct wordlist *ws, const char *overhang, size_t wid
 		if (w)
 		{
 			/* extra space is for format=flowed */
-			printf(" \n%s", overhang);
+			printf("%s\n%s", flowed ? " " : "", overhang);
 		}
 		else
 			printf("\n");
