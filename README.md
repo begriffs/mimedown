@@ -7,12 +7,11 @@ graphical and console mail clients.
 
 * Creates a conservative [ISO/IEC 15445:2000
   HTML](https://www.iso.org/standard/27688.html) representation, which is set
-  as the preferred multipart altnernative so that janky clients like GMail will
-  have a good experience.
+  as the preferred multipart alternative for graphical clients.
 * The text alternative is reflowed at 72 characters to look good in standard
   console mail readers.
-* However the text part also uses format=flowed, so it will shrink on narrow
-  screens or terminal splits.
+* The text part also uses format=flowed, so it will shrink on narrow screens or
+  terminal splits.
 * Fenced code blocks in the markdown are added as inline attachments with the
   appropriate MIME type. This makes them easy to download/save from the
   message.
