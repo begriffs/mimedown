@@ -147,11 +147,25 @@ void render_heading(cmark_iter *iter)
 	puts("\n");
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
 	char buf[BUFSIZ];
 	size_t bytes;
 	cmark_node *doc;
+
+	/* -h flag says to skip SMTP headers */
+	if (argc > 1 && strcmp(argv[1], "-s") == 0)
+	{
+		int c, n = 0;
+		while ((c = getchar()) != EOF)
+		{
+			putchar(c);
+			if (c == '\n' && ++n > 1)
+				break; /* two consecutive newlines */
+			else
+				n = 0;
+		}
+	}
 
 	cmark_parser *p = cmark_parser_new(CMARK_OPT_DEFAULT);
 	while ((bytes = fread(buf, 1, sizeof(buf), stdin)) > 0)
