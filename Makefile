@@ -1,7 +1,7 @@
 .POSIX:
 
 OBJS = filetype.o wrap.o smtp.o
-CFLAGS = -std=c99 -g -pedantic -Wall -Wextra -Wshadow -D_POSIX_C_SOURCE=200112L
+CFLAGS = -std=c99 -g -pedantic -Wall -Wextra -Wshadow
 
 .SUFFIXES :
 .SUFFIXES : .o .c
