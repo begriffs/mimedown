@@ -2,6 +2,7 @@
 
 OBJS = filetype.o wrap.o smtp.o
 CFLAGS = -std=c99 -g -pedantic -Wall -Wextra -Wshadow
+LDLIBS = -lm
 
 .SUFFIXES :
 .SUFFIXES : .o .c
