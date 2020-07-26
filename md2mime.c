@@ -187,16 +187,15 @@ int main(int argc, char **argv)
 	} section, prev_section = SEC_NONE;
 
 	char *msgid = generate_msgid("example.com");
-	printf("Message-ID: %s\n", msgid);
-	if (msgid) free(msgid);
+	printf("Message-ID: <%s>\n", msgid);
 	puts("MIME-Version: 1.0\n"
 	     "Content-Type: multipart/alternative; boundary=boundary41\n\n"
 		 "--boundary41\n"
 	     "Content-Type: multipart/mixed; boundary=boundary42");
 
+	int nth_code_block = 0, nth_block = 0;
 	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
 	{
-		int nth_code_block = 0;
 		const char *code;
 		cmark_node *cur = cmark_iter_get_node(iter);
 		cmark_node_type type = cmark_node_get_type(cur);
@@ -216,19 +215,20 @@ int main(int argc, char **argv)
 						filename_mime(filename));
 					if (*filename == '\0')
 						printf(
-							"Content-Disposition: inline; filename=code-%d.txt\n\n",
+							"Content-Disposition: inline; filename=code-%d.txt\n",
 							nth_code_block++);
 					else
 						printf(
-							"Content-Disposition: inline; filename=%s\n\n",
+							"Content-Disposition: inline; filename=%s\n",
 							filename);
 				}
 				else
 				{
 					puts("Content-Type: text/plain; charset=\"utf-8\"; "
 					     "format=\"flowed\"");
-					puts("Content-Disposition: inline\n");
+					puts("Content-Disposition: inline");
 				}
+				printf("Content-ID: <%i.%s>\n\n", nth_block++, msgid);
 			}
 			switch (cmark_node_get_type(cur))
 			{
@@ -288,6 +288,7 @@ int main(int argc, char **argv)
 	puts("--boundary41--");
 	cmark_iter_free(iter);
 	cmark_node_free(doc);
+	free(msgid);
 
 	return EXIT_SUCCESS;
 }

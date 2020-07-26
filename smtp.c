@@ -60,9 +60,9 @@ char *generate_msgid(const char *host)
 	if (!s || !t)
 		goto done;
 
-	msgid = malloc(strlen(s) + strlen(t) + strlen(host) + 5);
+	msgid = malloc(strlen(s) + strlen(t) + strlen(host) + 3);
 	if (msgid)
-		sprintf(msgid, "<%s.%s@%s>", s, t, host);
+		sprintf(msgid, "%s.%s@%s", s, t, host);
 done:
 	if (s) free(s);
 	if (t) free(t);
