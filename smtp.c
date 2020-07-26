@@ -52,11 +52,10 @@ char *generate_msgid(const char *host)
 	get_random_bytes(&rnd, sizeof rnd);
 
 	/* Typically time() returns seconds since the UNIX epoch. The C99 standard
-	 * says that the range and precision is implementation-defined. For our
-	 * purposes what matters is that time() gives us values that won't repeat
-	 * for a very long time */
+	 * says that the range and precision is implementation-defined. What
+	 * matters is getting numbers that don't repeat for a long time. */
 	char *s = alpha_radix(time(NULL), atext, sizeof atext),
-		 *t = alpha_radix(rnd, atext, sizeof atext),
+	     *t = alpha_radix(rnd, atext, sizeof atext),
 	     *msgid = NULL;
 	if (!s || !t)
 		goto done;
