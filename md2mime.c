@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "filetype.h"
+#include "smtp.h"
 #include "wrap.h"
 #include "vendor/uthash.h"
 
@@ -185,6 +186,9 @@ int main(int argc, char **argv)
 		SEC_NONE, SEC_MSG, SEC_CODE
 	} section, prev_section = SEC_NONE;
 
+	char *msgid = generate_msgid("example.com");
+	printf("Message-ID: %s\n", msgid);
+	if (msgid) free(msgid);
 	puts("MIME-Version: 1.0\n"
 	     "Content-Type: multipart/alternative; boundary=boundary41\n\n"
 		 "--boundary41\n"
