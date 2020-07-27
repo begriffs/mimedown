@@ -41,12 +41,15 @@ static char *alpha_radix(uintmax_t n, const char *alpha, size_t nalpha)
 char *generate_msgid(const char *host)
 {
 	/* atext tokens from RFC 2822
-	 * https://tools.ietf.org/html/rfc2822.html#section-3.2.4 */
+	 * https://tools.ietf.org/html/rfc2822.html#section-3.2.4
+	 * However, to allow referencing msg ids in urls, avoid:
+	 *   URL reserved chars ; / ? : @ = &
+	 *   URL unsafe chars " < > # % { } | \ ^ ~ [ ] ` */
 	static const char atext[] =
 		"0123456789"
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 		"abcdefghijklmnopqrstuvwxyz"
-		"!$&*-=^`|~#%'+/?_{}";
+		"$!*-~'+_";
 
 	uint_least64_t rnd;
 	get_random_bytes(&rnd, sizeof rnd);
