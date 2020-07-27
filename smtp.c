@@ -54,8 +54,8 @@ char *generate_msgid(const char *host)
 	/* Typically time() returns seconds since the UNIX epoch. The C99 standard
 	 * says that the range and precision is implementation-defined. What
 	 * matters is getting numbers that don't repeat for a long time. */
-	char *s = alpha_radix(time(NULL), atext, sizeof atext),
-	     *t = alpha_radix(rnd, atext, sizeof atext),
+	char *s = alpha_radix(time(NULL), atext, (sizeof atext)-1),
+	     *t = alpha_radix(rnd, atext, (sizeof atext)-1),
 	     *msgid = NULL;
 	if (!s || !t)
 		goto done;
