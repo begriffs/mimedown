@@ -182,7 +182,14 @@ int main(int argc, char **argv)
 		return EXIT_FAILURE;
 	}
 	if (optind < argc)
+	{
 		host = argv[optind];
+		if (strchr(host, '@'))
+		{
+			fputs("Hostname should not contain '@'\n", stderr);
+			return EXIT_FAILURE;
+		}
+	}
 
 	if (preserve_headers)
 	{
