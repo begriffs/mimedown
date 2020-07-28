@@ -5,7 +5,6 @@
 
 #include <unistd.h>
 
-#include "filetype.h"
 #include "smtp.h"
 #include "wrap.h"
 #include "vendor/uthash.h"
