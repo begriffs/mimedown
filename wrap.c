@@ -75,6 +75,17 @@ size_t print_wrapped(
 	w = TAILQ_FIRST(ws);
 	while (w)
 	{
+		if ((size_t)w->len > width)
+		{
+			/* bite the bullet if a word by itself is too long */
+			printf("%.*s", (int)w->len, w->start);
+			w = TAILQ_NEXT(w, entries);
+			if (w)
+				printf("%s\n%s", flowed ? " " : "", overhang);
+			else
+				printf("\n");
+		}
+
 		for (total = 0;
 			w && total + w->len + 1 < width;
 			total += w->len + 1, w = TAILQ_NEXT(w, entries))
@@ -85,10 +96,7 @@ size_t print_wrapped(
 			printf("%.*s", (int)w->len, w->start);
 		}
 		if (w)
-		{
-			/* extra space is for format=flowed */
 			printf("%s\n%s", flowed ? " " : "", overhang);
-		}
 		else
 			printf("\n");
 	}
