@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <unistd.h>
+
 #include "filetype.h"
 #include "smtp.h"
 #include "wrap.h"
@@ -154,11 +156,38 @@ int main(int argc, char **argv)
 	size_t bytes;
 	cmark_node *doc;
 
-	/* -h flag says to skip SMTP headers */
-	if (argc > 1 && strcmp(argv[1], "-s") == 0)
+	int c;
+	bool arg_err = false, preserve_headers = false;
+	char *host;
+	while ((c = getopt(argc, argv, "p")) != -1)
 	{
-		int c, n = 0;
-		while ((c = getchar()) != EOF)
+		switch(c)
+		{
+			case 'p':
+				preserve_headers = true;
+				break;
+			case '?':
+				fprintf(stderr, "Unrecognized option: '-%c'\n", optopt);
+				arg_err = true;
+				break;
+			default:
+				assert(0);
+		}
+	}
+	if (arg_err || optind >= argc)
+	{
+		fprintf(stderr,
+				"usage: %s [-p] sender-host\n"
+				"\twhere -p = preserve headers\n", argv[0]);
+		return EXIT_FAILURE;
+	}
+	if (optind < argc)
+		host = argv[optind];
+
+	if (preserve_headers)
+	{
+		unsigned n = 0;
+		for (c = 0; (c = getchar()) != EOF; )
 		{
 			if (c == '\n')
 			{
@@ -189,7 +218,7 @@ int main(int argc, char **argv)
 		SEC_NONE, SEC_MSG, SEC_CODE
 	} section, prev_section = SEC_NONE;
 
-	char *msgid = generate_msgid("example.com");
+	char *msgid = generate_msgid(host);
 	printf("Message-ID: <%s>\n", msgid);
 	puts("MIME-Version: 1.0\n"
 	     "Content-Type: multipart/alternative; boundary=boundary41\n\n"
