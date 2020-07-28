@@ -160,11 +160,14 @@ int main(int argc, char **argv)
 		int c, n = 0;
 		while ((c = getchar()) != EOF)
 		{
-			putchar(c);
-			if (c == '\n' && ++n > 1)
-				break; /* two consecutive newlines */
+			if (c == '\n')
+			{
+				if (++n > 1)
+					break; /* two consecutive newlines */
+			}
 			else
 				n = 0;
+			putchar(c);
 		}
 	}
 
