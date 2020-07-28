@@ -34,11 +34,13 @@ make
 ### Usage
 
 ```sh
-./md2mime < message.md > message.email
+./md2mime sender-domain.com < message.md > message.email
 ```
 
-Then edit message.email to add headers like Subject, etc. Send the message
-using a program like [msmtp](https://marlam.de/msmtp/):
+The sender domain is required to generate a good Message-ID.
+
+If the original message starts with headers, pass `-p` to preserve them. Send
+the message using a program like [msmtp](https://marlam.de/msmtp/):
 
 ```sh
 msmtp recipient@example.com < message.email
