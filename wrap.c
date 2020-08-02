@@ -75,26 +75,18 @@ size_t print_wrapped(
 	w = TAILQ_FIRST(ws);
 	while (w)
 	{
-		if ((size_t)w->len > width)
-		{
-			/* bite the bullet if a word by itself is too long */
-			printf("%.*s", (int)w->len, w->start);
-			w = TAILQ_NEXT(w, entries);
-			if (w)
-				printf("%s\n%s", flowed ? " " : "", overhang);
-			else
-				printf("\n");
-		}
-
-		for (total = 0;
-			w && total + w->len + 1 < width;
-			total += w->len + 1, w = TAILQ_NEXT(w, entries))
+		total = 0;
+		do /* print at least one word, even if it's "too long" */
 		{
 			if (total > 0)
 				putchar(' ');
 			longest_line = MAX(total + w->len, longest_line);
 			printf("%.*s", (int)w->len, w->start);
-		}
+
+			total += w->len + 1;
+			w = TAILQ_NEXT(w, entries);
+		} while (w && total + w->len + 1 < width);
+
 		if (w)
 			printf("%s\n%s", flowed ? " " : "", overhang);
 		else
