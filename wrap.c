@@ -14,7 +14,10 @@ static void _wordlist_invariant(const struct wordlist *ws)
 #ifndef NDEBUG
 	struct wordlist_entry *w;
 	TAILQ_FOREACH(w, ws, entries)
+	{
 		assert(w->len >= 0);
+		assert(strcspn(w->start, " \t") >= (size_t)w->len);
+	}
 #endif
 }
 
@@ -29,9 +32,7 @@ struct wordlist *wordlist_create(void)
 /* TODO: do unicode word break detection with ICU */
 struct wordlist *wordlist_append(struct wordlist *ws, const char *text)
 {
-	const char *start;
-
-	while (start = text, *text)
+	while (*text)
 	{
 		struct wordlist_entry *w = malloc(sizeof *w);
 		while (isspace(*text))
@@ -39,7 +40,7 @@ struct wordlist *wordlist_append(struct wordlist *ws, const char *text)
 		w->start = text;
 		while (*text && !isspace(*text))
 			text++;
-		w->len = text - start;
+		w->len = text - w->start;
 		while (isspace(*text))
 			text++;
 		TAILQ_INSERT_TAIL(ws, w, entries);
