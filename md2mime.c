@@ -314,7 +314,7 @@ int main(int argc, char **argv)
 
 	if (HASH_COUNT(g_links))
 	{
-		struct doc_link *x;
+		struct doc_link *x, *next;
 
 		puts("\n--boundary42");
 		puts("Content-Type: text/uri-list; charset=\"utf-8\"");
@@ -322,11 +322,16 @@ int main(int argc, char **argv)
 
 		/* that the ids are printed in sorted order relies on the fact
 		 * that items are visited in insertion order */
-		for (x = g_links; x; x = x->hh.next)
+		for (x = g_links; x; x = next)
 		{
 			printf("# %zu: ", x->id);
 			print_wrapped(x->caption, "", SIZE_MAX, false);
 			puts(x->url);
+			next = x->hh.next;
+
+			wordlist_free(x->caption);
+			HASH_DEL(g_links, x);
+			free(x);
 		}
 	}
 
