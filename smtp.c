@@ -72,6 +72,20 @@ done:
 	return msgid;
 }
 
+/* caller must free */
+char *generate_mime_boundary(void)
+{
+	/* https://tools.ietf.org/html/rfc2046#section-5.1.1 */
+	static const char bcharsnospace[] =
+		"0123456789"
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		"abcdefghijklmnopqrstuvwxyz"
+		"'()+_,-./:=?";
+	uintmax_t rnd;
+	get_random_bytes(&rnd, sizeof rnd);
+	return alpha_radix(rnd, bcharsnospace, (sizeof bcharsnospace)-1);
+}
+
 const char *filename_mime(const char *f)
 {
 	static struct {

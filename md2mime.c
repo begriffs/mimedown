@@ -241,12 +241,15 @@ int main(int argc, char **argv)
 		SEC_NONE, SEC_MSG, SEC_CODE
 	} section, prev_section = SEC_NONE;
 
-	char *msgid = generate_msgid(host);
+	char *msgid = generate_msgid(host),
+	     *boundary_a = generate_mime_boundary(),
+	     *boundary_b = generate_mime_boundary();
 	printf("Message-ID: <%s>\n", msgid);
-	puts("MIME-Version: 1.0\n"
-	     "Content-Type: multipart/alternative; boundary=boundary41\n\n"
-		 "--boundary41\n"
-	     "Content-Type: multipart/mixed; boundary=boundary42");
+	printf("MIME-Version: 1.0\n"
+	       "Content-Type: multipart/alternative; boundary=\"%s\"\n\n"
+		   "--%s\n"
+	       "Content-Type: multipart/mixed; boundary=\"%s\"\n",
+		   boundary_a, boundary_a, boundary_b);
 
 	int nth_code_block = 0, nth_block = 0;
 	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
@@ -262,7 +265,7 @@ int main(int argc, char **argv)
 			if (section != prev_section)
 			{
 				prev_section = section;
-				puts("\n--boundary42");
+				printf("\n--%s\n", boundary_b);
 				if (section == SEC_CODE)
 				{
 					const char *filename = cmark_node_get_fence_info(cur);
@@ -316,7 +319,7 @@ int main(int argc, char **argv)
 	{
 		struct doc_link *x, *next;
 
-		puts("\n--boundary42");
+		printf("\n--%s\n", boundary_b);
 		puts("Content-Type: text/uri-list; charset=\"utf-8\"");
 		puts("Content-Disposition: inline; filename=references.uri\n");
 
@@ -335,8 +338,8 @@ int main(int argc, char **argv)
 		}
 	}
 
-	puts("\n--boundary42--\n");
-	puts("--boundary41");
+	printf("\n--%s--\n\n",boundary_b);
+	printf("--%s\n", boundary_a);
 	puts("Content-Type: text/html; charset=\"utf-8\"");
 	puts("Content-Disposition: inline\n");
 
@@ -349,10 +352,12 @@ int main(int argc, char **argv)
 	free(html);
 	
 	puts("</body></html>\n");
-	puts("--boundary41--");
+	printf("--%s--\n", boundary_a);
 	cmark_iter_free(iter);
 	cmark_node_free(doc);
 	free(msgid);
+	free(boundary_a);
+	free(boundary_b);
 
 	return EXIT_SUCCESS;
 }
