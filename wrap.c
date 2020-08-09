@@ -49,6 +49,19 @@ struct wordlist *wordlist_append(struct wordlist *ws, const char *text)
 	return ws;
 }
 
+/* src and dst will share the underlying string memory */
+void wordlist_concat(struct wordlist *dst, const struct wordlist *src)
+{
+	/* can't use TAILQ_CONCAT because it truncates the source */
+	struct wordlist_entry *w;
+	TAILQ_FOREACH(w, src, entries)
+	{
+		struct wordlist_entry *cpy = malloc(sizeof *cpy);
+		*cpy = *w;
+		TAILQ_INSERT_TAIL(dst, cpy, entries);
+	}
+}
+
 /* note: underlying string must be freed by caller */
 void wordlist_free(struct wordlist *ws)
 {

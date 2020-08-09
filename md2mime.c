@@ -18,10 +18,24 @@ struct doc_link
 {
 	size_t id;
 	char pretty_id[10];
-	const char *title;
+	struct wordlist *caption;
 	const char *url;
 	UT_hash_handle hh;
 } *g_links = NULL;
+
+void snarf_node(cmark_iter *iter)
+{
+	cmark_event_type ev_type;
+	cmark_node *cur = cmark_iter_get_node(iter);
+	cmark_node_type outer = cmark_node_get_type(cur);
+
+	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
+	{
+		if (ev_type == CMARK_EVENT_EXIT &&
+		    cmark_node_get_type(cmark_iter_get_node(iter)) == outer)
+			break;
+	}
+}
 
 struct doc_link *parse_link(cmark_iter *iter)
 {
@@ -35,6 +49,19 @@ struct doc_link *parse_link(cmark_iter *iter)
 
 	url = cmark_node_get_url(cur);
 	HASH_FIND_STR(g_links, url, link);
+	if (link)
+	{	/* seen it, move on */
+		snarf_node(iter);
+		return link;
+	}
+	link = malloc(sizeof *link);
+	link->id = HASH_COUNT(g_links);
+	snprintf(link->pretty_id, sizeof link->pretty_id,
+			"[%zu]", link->id);
+	link->url = url;
+	link->caption = wordlist_create();
+	HASH_ADD_KEYPTR(hh, g_links, link->url,
+			strlen(link->url), link);
 
 	while ((ev_type = cmark_iter_next(iter)) != CMARK_EVENT_DONE)
 	{
@@ -44,17 +71,7 @@ struct doc_link *parse_link(cmark_iter *iter)
 		if (ev_type == CMARK_EVENT_EXIT && type == CMARK_NODE_LINK)
 			break;
 		if (ev_type == CMARK_EVENT_ENTER && type == CMARK_NODE_TEXT)
-			if (!link)
-			{
-				link = malloc(sizeof *link);
-				link->id = HASH_COUNT(g_links);
-				snprintf(link->pretty_id, sizeof link->pretty_id,
-						"[%zu]", link->id);
-				link->url = url;
-				link->title = cmark_node_get_literal(cur);
-				HASH_ADD_KEYPTR(hh, g_links, link->url,
-						strlen(link->url), link);
-			}
+			wordlist_append(link->caption, cmark_node_get_literal(cur));
 	}
 	return link;
 }
@@ -81,7 +98,7 @@ size_t render_inner_text(cmark_iter *iter, char *prefix, char *overhang, bool fl
 				struct doc_link *link = parse_link(iter);
 				if (link)
 				{
-					wordlist_append(ws, link->title);
+					wordlist_concat(ws, link->caption);
 					wordlist_append(ws, link->pretty_id);
 				}
 				else
@@ -306,7 +323,11 @@ int main(int argc, char **argv)
 		/* that the ids are printed in sorted order relies on the fact
 		 * that items are visited in insertion order */
 		for (x = g_links; x; x = x->hh.next)
-			printf("# %zu: %s\n%s\n", x->id, x->title, x->url);
+		{
+			printf("# %zu: ", x->id);
+			print_wrapped(x->caption, "", SIZE_MAX, false);
+			puts(x->url);
+		}
 	}
 
 	puts("\n--boundary42--\n");
