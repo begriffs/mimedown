@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX(x,y) ((x<y) ? (y) : (x))
+#define MAX(x,y) ((x)<(y) ? (y) : (x))
 
 static void _wordlist_invariant(const struct wordlist *ws)
 {
