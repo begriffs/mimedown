@@ -71,7 +71,7 @@ struct doc_link *parse_link(cmark_iter *iter)
 		if (ev_type == CMARK_EVENT_EXIT && type == CMARK_NODE_LINK)
 			break;
 		if (ev_type == CMARK_EVENT_ENTER && type == CMARK_NODE_TEXT)
-			wordlist_append(link->caption, cmark_node_get_literal(cur));
+			wordlist_segment(link->caption, cmark_node_get_literal(cur));
 	}
 	return link;
 }
@@ -99,16 +99,16 @@ size_t render_inner_text(cmark_iter *iter, char *prefix, char *overhang, bool fl
 				if (link)
 				{
 					wordlist_concat(ws, link->caption);
-					wordlist_append(ws, link->pretty_id);
+					wordlist_segment(ws, link->pretty_id);
 				}
 				else
-					wordlist_append(ws, "[could not parse link]");
+					wordlist_segment(ws, "[could not parse link]");
 			}
 			else
 			{
 				const char *content = cmark_node_get_literal(cur);
 				if (content)
-					wordlist_append(ws, content);
+					wordlist_segment(ws, content);
 			}
 		}
 	}

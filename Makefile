@@ -13,7 +13,7 @@ include config.mk
 md2mime : md2mime.c $(OBJS)
 	$(CC) $(CFLAGS) $(POSIX) $(LDFLAGS) -o $@ md2mime.c $(OBJS) $(LDLIBS)
 
-wrap.o : wrap.c wrap.h vendor/queue.h
+wrap.o : wrap.c wrap.h
 
 smtp.o : smtp.c smtp.h
 
