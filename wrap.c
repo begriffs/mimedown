@@ -89,7 +89,15 @@ void wordlist_free(struct wordlist *ws)
 	free(ws);
 }
 
-
+/* the cost (gap until width, squared) of putting words (i..j) on a line of
+ * their own for all i, j. If they extend past the width, the cost is
+ * considered infinite.
+ *
+ * Representing cost as floating point to get arithmetic that respects
+ * INFINITY. Also I don't make equality comparisons that could be troublesome.
+ *
+ * Caller must free the return value and its first element.
+ */
 static float **line_costs(const struct wordlist *ws, unsigned width)
 {
 	size_t i, j;
@@ -122,7 +130,10 @@ static float **line_costs(const struct wordlist *ws, unsigned width)
 	return table;
 }
 
-size_t *best_breaks(const struct wordlist *ws, unsigned width)
+/* Use bottom-up dynamic programming to create a list of "parent pointers" of
+ * word indices before which a break should be placed. The pointers are in this
+ * case array indices, which you follow like ret[0], ret[ret[0]], ...  */
+static size_t *best_breaks(const struct wordlist *ws, unsigned width)
 {
 	size_t i, j;
 	float **costs    = line_costs(ws, width);
