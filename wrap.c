@@ -100,6 +100,8 @@ void wordlist_free(struct wordlist *ws)
  */
 static float **line_costs(const struct wordlist *ws, unsigned width)
 {
+	assert(ws && ws->len > 0);
+
 	size_t i, j;
 	/* underlying chunk of memory that can be freed in one go */
 	float *mem = malloc((sizeof *mem) * ws->len * ws->len);
@@ -135,6 +137,8 @@ static float **line_costs(const struct wordlist *ws, unsigned width)
  * case array indices, which you follow like ret[0], ret[ret[0]], ...  */
 static size_t *best_breaks(const struct wordlist *ws, unsigned width)
 {
+	assert(ws && ws->len > 0);
+
 	size_t i, j;
 	float **costs    = line_costs(ws, width);
 	float  *min_cost = malloc(1 + ws->len * sizeof *min_cost);
@@ -165,6 +169,9 @@ size_t print_wrapped(
 		size_t width, bool flowed)
 {
 	_wordlist_invariant(ws);
+	if (ws->len == 0)
+		return 0;
+
 	width -= strlen(overhang);
 
 	size_t i, brk;
