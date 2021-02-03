@@ -1,3 +1,4 @@
+#define _GNU_SOURCE
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -14,8 +15,13 @@ static void get_random_bytes(void *buf, size_t n)
 {
 #if defined HAVE_ARC4RANDOM  /* BSD */
 	arc4random_buf(buf, n);
-#elif defined HAVE_GETRANDOM /* Linux */
+#elif defined HAVE_GETRANDOM /* Linux, GLIBC >= 2.25 */
 	getrandom(buf, n, 0);
+#elif defined __linux__ && defined __GLIBC__ && \
+    __GLIBC__ <= 2 &&  __GLIBC_MINOR__ < 25 /* Linux, GLIBC < 2.25 */
+    #include <unistd.h>
+    #include <sys/syscall.h>
+    syscall(SYS_getrandom, buf, n, 0);
 #else
 #error OS does not provide recognized function to get entropy
 #endif
