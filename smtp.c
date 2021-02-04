@@ -1,3 +1,6 @@
+#ifdef HAVE_GETRANDOM_SYSCALL
+#define _GNU_SOURCE
+#endif
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>

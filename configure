@@ -54,5 +54,5 @@ elif compiles "-D_GNU_SOURCE" "
         return (intptr_t)p & n;
     }"
 then
-    echo "CFLAGS += -D_GNU_SOURCE -DHAVE_GETRANDOM_SYSCALL" >> config.mk
+    echo "CFLAGS += -DHAVE_GETRANDOM_SYSCALL" >> config.mk
 fi
