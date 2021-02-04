@@ -23,7 +23,7 @@ static void get_random_bytes(void *buf, size_t n)
 #elif defined HAVE_GETRANDOM /* Linux, GLIBC >= 2.25 */
 	getrandom(buf, n, 0);
 #elif defined HAVE_GETRANDOM_SYSCALL
-    syscall(SYS_getrandom, buf, n, 0);
+	syscall(SYS_getrandom, buf, n, 0);
 #else
 #error OS does not provide recognized function to get entropy
 #endif

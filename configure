@@ -45,14 +45,14 @@ then
 	echo "CFLAGS += -DHAVE_GETRANDOM" >> config.mk
 
 elif compiles "-D_GNU_SOURCE" "
-    #include <unistd.h>
-    #include <sys/syscall.h>
-    int main(void)
-    {
-        long n = SYS_getrandom;
-        long (*p)(long, ...) = syscall;
-        return (intptr_t)p & n;
-    }"
+	#include <unistd.h>
+	#include <sys/syscall.h>
+	int main(void)
+	{
+		long n = SYS_getrandom;
+		long (*p)(long, ...) = syscall;
+		return (intptr_t)p & n;
+	}"
 then
-    echo "CFLAGS += -DHAVE_GETRANDOM_SYSCALL" >> config.mk
+	echo "CFLAGS += -DHAVE_GETRANDOM_SYSCALL" >> config.mk
 fi
