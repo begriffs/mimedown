@@ -7,14 +7,15 @@
 Name:       mimedown
 Version:    2f298c3
 Release:    1%{?dist}
-Summary:    A tool to display user-oriented Slurm partition information.
+Summary:    A tool to convert markdown to multipart MIME
 
 Group:      System Environment/Base
-License:    GPLv2+
+License:    ISC
 URL:        https://github.com/%{repo}/%{name}
 Source:     https://github.com/%{repo}/%{name}/archive/%{commit}/%{name}-%{shortcommit}.tar.gz
 
-BuildRequires:   cmark-devel
+BuildRequires:   pkgconfig(libcmark)
+BuildRequires:   gcc
 Requires:   cmark
 
 %description
