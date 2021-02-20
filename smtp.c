@@ -1,3 +1,6 @@
+#ifdef HAVE_GETRANDOM_SYSCALL
+#define _GNU_SOURCE
+#endif
 #include <math.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -6,6 +9,9 @@
 #include <time.h>
 #ifdef HAVE_GETRANDOM
 #include <sys/random.h>
+#elif defined HAVE_GETRANDOM_SYSCALL
+#include <unistd.h>
+#include <sys/syscall.h>
 #endif
 
 #include "smtp.h"
@@ -14,8 +20,10 @@ static void get_random_bytes(void *buf, size_t n)
 {
 #if defined HAVE_ARC4RANDOM  /* BSD */
 	arc4random_buf(buf, n);
-#elif defined HAVE_GETRANDOM /* Linux */
+#elif defined HAVE_GETRANDOM /* Linux, GLIBC >= 2.25 */
 	getrandom(buf, n, 0);
+#elif defined HAVE_GETRANDOM_SYSCALL
+	syscall(SYS_getrandom, buf, n, 0);
 #else
 #error OS does not provide recognized function to get entropy
 #endif
